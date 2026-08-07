@@ -1,0 +1,42 @@
+services:
+  rabbitmq-broker:
+    image: rabbitmq:3-management
+    container_name: rabbitmq-broker
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  mongodb-store:
+    image: mongo:7
+    container_name: mongodb-store
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  transaction-worker:
+    build:
+      context: .
+      dockerfile: transaction_worker/Dockerfile
+    container_name: transaction-worker
+    environment:
+      RABBITMQ_HOST: rabbitmq-broker
+      MONGO_URI: mongodb://mongodb-store:27017
+    depends_on:
+      - rabbitmq-broker
+      - mongodb-store
+
+  balance-api:
+    build:
+      context: .
+      dockerfile: balance_api/Dockerfile
+    container_name: balance-api
+    environment:
+      MONGO_URI: mongodb://mongodb-store:27017
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb-store
+
+volumes:
+  mongo_data:
