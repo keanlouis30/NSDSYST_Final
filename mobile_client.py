@@ -19,6 +19,8 @@ def check_balance(account_id):
     else:
         print(f"[Mobile App] Error: {response.json().get('detail', 'Unknown error')}")
 
+    return response
+
 
 if __name__ == "__main__":
     account_id = sys.argv[1] if len(sys.argv) > 1 else "1002-XYZ"

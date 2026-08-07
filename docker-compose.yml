@@ -11,8 +11,16 @@ services:
     container_name: mongodb-store
     ports:
       - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
+    # Ledger lives on a tmpfs, i.e. host RAM. Docker tears a tmpfs mount down
+    # whenever the container stops, so `docker compose restart` wipes every
+    # account. This is deliberate: restart_demo.py uses it to show the flaw of
+    # keeping state in memory.
+    tmpfs:
+      - /data/db
+    # THE FIX: swap the tmpfs above for a durable named volume, and the same
+    # restart leaves balances untouched (also uncomment the volumes: block below).
+    # volumes:
+    #   - mongo_data:/data/db
 
   transaction-worker:
     build:
@@ -38,5 +46,6 @@ services:
     depends_on:
       - mongodb-store
 
-volumes:
-  mongo_data:
+# Durable storage for the "fix" half of the demo — see mongodb-store above.
+# volumes:
+#   mongo_data:
