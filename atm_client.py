@@ -1,3 +1,5 @@
+# Written in partial fulfillment for the requirements of NSDSYST by Kean Rosales and Evan Pinca
+
 import json
 import sys
 

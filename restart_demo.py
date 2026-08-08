@@ -1,3 +1,5 @@
+# Written in partial fulfillment for the requirements of NSDSYST by Kean Rosales and Evan Pinca
+
 """Demonstrates the volatility flaw of keeping the ledger in memory.
 
 Deposits money, shows the balance, runs `docker compose restart`, then asks the
@@ -5,8 +7,10 @@ Balance API for the same account again. Because mongodb-store keeps /data/db on
 a tmpfs (host RAM), stopping the container tears that filesystem down and every
 account record disappears with it.
 
-Run from the project root, on the host where Docker is running:
+Fresh machine, from the extracted project folder (no git clone needed):
 
+    pip3 install -r requirements.txt
+    docker compose up --build -d
     python3 restart_demo.py
 
 If your Docker needs elevated rights:
@@ -20,10 +24,17 @@ import subprocess
 import sys
 import time
 
-import requests
+try:
+    import requests
 
-from atm_client import send_transaction
-from mobile_client import check_balance
+    from atm_client import send_transaction
+    from mobile_client import check_balance
+except ImportError as exc:
+    print(f"[Demo] Missing dependency: {exc.name}")
+    print("[Demo] Install the client libraries first:")
+    print("       pip3 install -r requirements.txt")
+    print("       (or: pip3 install pika requests)")
+    sys.exit(1)
 
 ACCOUNT_ID = "1002-XYZ"
 DEPOSIT_AMOUNT = 250.00
